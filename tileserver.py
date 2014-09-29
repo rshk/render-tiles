@@ -37,14 +37,14 @@ POSTGIS_TABLE = dict(
     password='gis',
     dbname='geocatalogo',
     table='stradario_trento_900913')
+LAYER_NAME = 'stradario_trento'
 
-WGS84 = '+proj=longlat +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +no_defs'  # 4326
-UTM32N = '+proj=utm +zone=32 +datum=WGS84 +units=m +no_defs'  # 32632
+# WGS84 = '+proj=longlat +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +no_defs'  # 4326
+# UTM32N = '+proj=utm +zone=32 +datum=WGS84 +units=m +no_defs'  # 32632
 
 # Google Mercator - EPSG:900913
 GOOGLEMERC = ('+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 '
               '+x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs')
-
 DATA_PROJECTION = mapnik.Projection(GOOGLEMERC)
 
 TILE_WIDTH = 256  # Square tiles only!
@@ -80,12 +80,7 @@ def num2deg(xtile, ytile, zoom):
 
 class TiledMapRenderer(object):
     def __init__(self, mapobj):
-        # maxZoom = 18
         self.m = mapobj
-        # Obtain <Map> projection
-        # self.prj = mapnik.Projection(self.m.srs)
-        # projects between tile pixel co-ordinates and LatLong (EPSG:4326)
-        # self.tileproj = GoogleProjection(maxZoom + 1)  # MH?
 
     def render_tile(self, z, x, y):
         """
@@ -115,12 +110,6 @@ class TiledMapRenderer(object):
         mapnik.render(self.m, im)
         return im
 
-    # def bbox2d(self, *a):
-    #     if hasattr(mapnik, 'mapnik_version') \
-    #             and mapnik.mapnik_version() >= 800:
-    #         return mapnik.Box2d(*a)
-    #     return mapnik.Envelope(*a)
-
 
 @web_ui.route('/')
 def index():
@@ -149,8 +138,9 @@ def render_tile(layer, z, x, y):
     s.rules.append(r)
     m.append_style('My Style', s)
 
+    # Initialize layer from PostGIS table
     ds = mapnik.PostGIS(**POSTGIS_TABLE)
-    layer = mapnik.Layer('stradario_trento')
+    layer = mapnik.Layer(LAYER_NAME)
     layer.datasource = ds
     layer.styles.append('My Style')
     m.layers.append(layer)
