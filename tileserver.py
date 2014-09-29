@@ -132,8 +132,17 @@ def render_tile(layer, z, x, y):
     # r.symbols.append(polygon_symbolizer)
 
     line_symbolizer = mapnik.LineSymbolizer(
-        mapnik.Color('#ff00ff'), 2)
+        mapnik.Color('#ff00ff'), 14)
+    line_symbolizer.stroke.opacity = 0.5
     r.symbols.append(line_symbolizer)
+
+    text_symbolizer = mapnik.TextSymbolizer(
+        mapnik.Expression('[desvia]'),
+        'DejaVu Sans Book', 10, mapnik.Color('black'))
+    text_symbolizer.halo_fill = mapnik.Color('white')
+    text_symbolizer.halo_radius = 2
+    text_symbolizer.label_placement = mapnik.label_placement.LINE_PLACEMENT
+    r.symbols.append(text_symbolizer)
 
     s.rules.append(r)
     m.append_style('My Style', s)
